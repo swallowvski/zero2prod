@@ -1,10 +1,12 @@
 use std::net::TcpListener;
 
+use env_logger::Env;
 use sqlx::PgPool;
 use zero2prod::{configuration::get_configuration, run};
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     let configuration = get_configuration().expect("Failed to tread configuration.");
     let connection = PgPool::connect(&configuration.database.connection_string())
         .await
