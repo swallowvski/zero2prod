@@ -15,10 +15,14 @@ async fn main() -> Result<(), std::io::Error> {
     init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to tread configuration.");
-    let connection = PgPool::connect(&configuration.database.connection_string().expose_secret())
-        .await
-        .expect("Failed to connect to Postgres.");
-    let address = format!("127.0.0.1:{}", configuration.application_port);
+    let connection =
+        PgPool::connect_lazy(&configuration.database.connection_string().expose_secret())
+            .expect("Failed to create Postgres connection pool.");
+    let address = format!(
+        "{}:{}",
+        configuration.application.host, configuration.application.port
+    );
+    tracing::info!("Staring address: {}", address);
     let listener = TcpListener::bind(address)?;
     run(listener, connection)?.await
 }
