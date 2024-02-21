@@ -47,10 +47,12 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let base_path = std::env::current_dir().expect("Failed to determine the current directory");
     let configuration_directory = base_path.join("configuration");
 
-    let environment: Environment = std::env::var("APP_ENVIROMENT")
-        .unwrap_or_else(|_| "local".into())
+    let environment: Environment = std::env::var("APP_ENVIRONMEN")
+        .unwrap_or_else(|_| "production".into())
         .try_into()
         .expect("Failed to parse APP_ENVIROMENT");
+    tracing::info!("ENV args: {}", environment.as_str());
+    tracing::info!("{:?}", std::env::var("APP_ENVIRONMEN"));
 
     let environment_filename = format!("{}.yaml", environment.as_str());
 
@@ -87,7 +89,7 @@ impl TryFrom<String> for Environment {
             "local" => Ok(Self::Local),
             "production" => Ok(Self::Production),
             other => Err(format!(
-                "{} is not a supported enviroment. \
+                "{} is not a supported environment. \
                 Use either `local` or `production`.",
                 other
             )),
