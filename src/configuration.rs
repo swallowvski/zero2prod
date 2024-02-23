@@ -44,7 +44,7 @@ impl DatabaseSettings {
             .ssl_mode(ssl_mode)
     }
     pub fn with_db(&self) -> PgConnectOptions {
-        let mut options = self.without_db().database(&self.database_name);
+        let options = self.without_db().database(&self.database_name);
         options.log_statements(tracing_log::log::LevelFilter::Trace)
     }
 }
@@ -53,12 +53,12 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let base_path = std::env::current_dir().expect("Failed to determine the current directory");
     let configuration_directory = base_path.join("configuration");
 
-    let environment: Environment = std::env::var("APP_ENVIRONMENT")
-        .unwrap_or_else(|_| "production".into())
+    tracing::info!("{:?}", std::env::var("APPENVIRONMENT"));
+
+    let environment: Environment = std::env::var("TEST")
+        .unwrap_or_else(|_| "local".into())
         .try_into()
         .expect("Failed to parse APP_ENVIROMENT");
-    tracing::info!("ENV args: {}", environment.as_str());
-    tracing::info!("{:?}", std::env::var("APP_ENVIRONMEN"));
 
     let environment_filename = format!("{}.yaml", environment.as_str());
 
